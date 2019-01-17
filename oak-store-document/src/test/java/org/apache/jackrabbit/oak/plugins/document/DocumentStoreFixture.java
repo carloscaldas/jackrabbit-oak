@@ -98,6 +98,7 @@ public abstract class DocumentStoreFixture {
 
     public DocumentStore createDocumentStore() {
         return createDocumentStore(new DocumentMK.Builder().setClusterId(1));
+
     }
 
     public boolean isAvailable() {

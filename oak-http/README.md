@@ -15,7 +15,7 @@ The following examples use the httpie client to perform simple CRUD operations.
 The username and password (by default `admin` and `admin`) have been specified
 in the `~/.netrc` file so they are not included on the command lines.
 
-    $ http -j -b localhost:8080
+    $ http -a admin:admin -j -b localhost:4502
     {
         "jcr:primaryType": "rep:root",
         "jcr:system": {},
@@ -25,7 +25,7 @@ in the `~/.netrc` file so they are not included on the command lines.
 
 You can add or modify content by posting JSON:
 
-    $ http -j -b localhost:8080/test \
+    $ http -a admin:admin -j -b localhost:4502/test \
           jcr\\:primaryType=oak:Unstructured foo=abc bar:=123
     {
         "bar": "123",

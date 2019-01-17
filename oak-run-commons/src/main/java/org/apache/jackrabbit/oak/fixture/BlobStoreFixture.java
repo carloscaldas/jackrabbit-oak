@@ -46,7 +46,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import static org.apache.jackrabbit.oak.fixture.DataStoreUtils.cleanup;
 import static org.apache.jackrabbit.oak.fixture.DataStoreUtils.configureIfCloudDataStore;
 
-public abstract class BlobStoreFixture implements Closeable{
+public abstract class BlobStoreFixture implements Closeable {
     private final String name;
     protected final String unique;
 
@@ -61,7 +61,7 @@ public abstract class BlobStoreFixture implements Closeable{
 
     public abstract long size();
 
-    public void close(){
+    public void close() {
         tearDown();
     }
 
@@ -69,7 +69,7 @@ public abstract class BlobStoreFixture implements Closeable{
      * Creates an instance of the BlobStoreFixture based on configuration
      * determined from system properties
      *
-     * @param basedir directory to be used in case of file based BlobStore
+     * @param basedir       directory to be used in case of file based BlobStore
      * @param fallbackToFDS if true then FileDataStore would be used in absence of
      *                      any explicitly defined BlobStore
      */
@@ -77,22 +77,31 @@ public abstract class BlobStoreFixture implements Closeable{
     public static BlobStoreFixture create(File basedir, boolean fallbackToFDS,
                                           int fdsCacheInMB,
                                           StatisticsProvider statisticsProvider) {
-
-        if(basedir == null) {
+        System.out.println("@@@@@ BlobStoreFixture.create#1");
+        if (basedir == null) {
+            System.out.println("@@@@@ BlobStoreFixture.create#2");
             basedir = FileUtils.getTempDirectory();
         }
+        System.out.println("@@@@@ BlobStoreFixture.create#3");
 
         String className = System.getProperty("dataStore");
+        System.out.println("@@@@@ BlobStoreFixture.create#4:" + className);
         if (className != null) {
+            System.out.println("@@@@@ BlobStoreFixture.create#5");
             return getDataStore(basedir, fdsCacheInMB, statisticsProvider);
         }
 
+        System.out.println("@@@@@ BlobStoreFixture.create#6");
         String blobStore = System.getProperty("blobStoreType");
+        System.out.println("@@@@@ BlobStoreFixture.create#7:" + blobStore);
         if ("FDS".equals(blobStore) || (blobStore == null && fallbackToFDS)) {
+            System.out.println("@@@@@ BlobStoreFixture.create#8");
             return getFileDataStore(basedir, DataStoreBlobStore.DEFAULT_CACHE_SIZE, statisticsProvider);
         } else if ("FBS".equals(blobStore)) {
+            System.out.println("@@@@@ BlobStoreFixture.create#9");
             return getFileBlobStore(basedir);
         } else if ("MEM".equals(blobStore)) {
+            System.out.println("@@@@@ BlobStoreFixture.create#10");
             return getMemoryBlobStore();
         }
 

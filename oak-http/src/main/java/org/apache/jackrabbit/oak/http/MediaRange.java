@@ -31,7 +31,7 @@ public class MediaRange {
     private static final int QRESOLUTION = 1000;
     private static double CORRECTIONFORSUBTYPEMATCH = 1f / (10 * QRESOLUTION);
     private static double CORRECTIONFORTYPEANDSUBTYPEMATCH = 2f / (10 * QRESOLUTION);
-    
+
     public static MediaRange parse(String range, MediaTypeRegistry registry) {
         MediaType type = MediaType.parse(range);
         if (type == null) {
@@ -44,9 +44,16 @@ public class MediaRange {
         String q = parameters.remove("q");
         if (q != null) {
             try {
-                return new MediaRange(
-                        new MediaType(type.getBaseType(), parameters),
-                        Double.parseDouble(q));
+//                return new MediaRange(
+//                        new MediaType(type.getBaseType(), parameters),
+//                        Double.parseDouble(q));
+                double defaultQ = 3.0;
+                if ("*/*".equals(type.getType())) {
+                    defaultQ = 1.0;
+                } else if ("*".equals(type.getSubtype())) {
+                    defaultQ = 2.0;
+                }
+                return new MediaRange(type, defaultQ);
             } catch (NumberFormatException e) {
                 return null;
             }
@@ -68,10 +75,8 @@ public class MediaRange {
      * 2/10000 if case both type and subtype are. This takes care of the
      * precedence specified in RFC 7231, Section 5.3.2.
      *
-     * @param type
-     *            type to match
-     * @param registry
-     *            media type registry
+     * @param type     type to match
+     * @param registry media type registry
      * @return {@code 0.0} for "no match", the derived quality value if match
      */
     public double match(MediaType type, MediaTypeRegistry registry) {

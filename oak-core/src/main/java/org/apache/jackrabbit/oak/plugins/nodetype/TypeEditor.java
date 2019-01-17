@@ -65,15 +65,15 @@ import org.slf4j.LoggerFactory;
 
 /**
  * Validator implementation that check JCR node type constraints.
- *
+ * <p>
  * TODO: check protected properties and the structure they enforce. some of
- *       those checks may have to go into separate validator classes. This class
- *       should only perform checks based on node type information. E.g. it
- *       cannot and should not check whether the value of the protected jcr:uuid
- *       is unique.
+ * those checks may have to go into separate validator classes. This class
+ * should only perform checks based on node type information. E.g. it
+ * cannot and should not check whether the value of the protected jcr:uuid
+ * is unique.
  */
 public class TypeEditor extends DefaultEditor {
-    
+
     /**
      * Extension point that allows pluggable handling of constraint violations
      */
@@ -81,18 +81,17 @@ public class TypeEditor extends DefaultEditor {
     public static interface ConstraintViolationCallback {
         /**
          * Invoked whenever a constraint violation is detected.
-         * 
+         *
          * <p>Implementors may choose to throw a {@link org.apache.jackrabbit.oak.api.CommitFailedException} or to handle the error
          * internally, for instance by logging.</p>
-         * 
+         *
          * <p>Implementors may <b>not</b> throw other exception types from this method.</p>
-         * 
-         * @param path the path where the constraint violation was detected
+         *
+         * @param path          the path where the constraint violation was detected
          * @param nodeTypeNames the node type names of the node
-         * @param code the error code
-         * @param message the descriptive error message
+         * @param code          the error code
+         * @param message       the descriptive error message
          * @throws CommitFailedException thrown when the implementation decides to stop further processing
-         * 
          * @see TypeEditor#THROW_ON_CONSTRAINT_VIOLATION
          * @see TypeEditor#WARN_ON_CONSTRAINT_VIOLATION
          */
@@ -100,47 +99,47 @@ public class TypeEditor extends DefaultEditor {
     }
 
     public static final ConstraintViolationCallback THROW_ON_CONSTRAINT_VIOLATION = new ConstraintViolationCallback() {
-        
+
         @Override
         public void onConstraintViolation(String path, List<String> nodeTypeNames, int code, String message) throws CommitFailedException {
-            
-            String fullPath =  path + '[' + nodeTypeNames.toString() + ']';
+
+            String fullPath = path + '[' + nodeTypeNames.toString() + ']';
 
             throw new CommitFailedException(CONSTRAINT, code, fullPath + ": " + message);
         }
     };
-    
+
     public static final ConstraintViolationCallback WARN_ON_CONSTRAINT_VIOLATION = new ConstraintViolationCallback() {
-        
+
         @Override
-        public void onConstraintViolation(String path, List<String> nodeTypeNames, int code, String message ) {
-            
-            String fullPath =  path + '[' + nodeTypeNames.toString() + ']';
+        public void onConstraintViolation(String path, List<String> nodeTypeNames, int code, String message) {
+
+            String fullPath = path + '[' + nodeTypeNames.toString() + ']';
 
             log.warn(new CommitFailedException(CONSTRAINT, code, fullPath + ": " + message).getMessage());
 
         }
     };
-    
+
     /**
      * Creates a new {@linkplain TypeEditor} instance
-     * 
-     * @param callback the callback to use when a constraint violation is found. The client must
-     *   check the results of the callback invocations if the specified callback does not
-     *   immediately propagate constraint violations as checked exceptions.
+     *
+     * @param callback     the callback to use when a constraint violation is found. The client must
+     *                     check the results of the callback invocations if the specified callback does not
+     *                     immediately propagate constraint violations as checked exceptions.
      * @param typesToCheck the types to check for. If {@code null}, this node is checked. Otherwise
-     *  it is checked if its primary type or one of it's mixin types is contained in this parameters
-     * @param types the {@code /jcr:system/jcr:nodeTypes} node
-     * @param primary the node's primary type
-     * @param mixins the node's mixins
-     * @param builder a builder containing the current state of the node to check. May be used to set
-     *  a default primary type if none is set
+     *                     it is checked if its primary type or one of it's mixin types is contained in this parameters
+     * @param types        the {@code /jcr:system/jcr:nodeTypes} node
+     * @param primary      the node's primary type
+     * @param mixins       the node's mixins
+     * @param builder      a builder containing the current state of the node to check. May be used to set
+     *                     a default primary type if none is set
      * @return a new TypeEditor instance
      * @throws CommitFailedException when the primary type of mixin definition is incorrect
      */
     public static TypeEditor create(@NotNull ConstraintViolationCallback callback, Set<String> typesToCheck,
-            @NotNull NodeState types, String primary, Iterable<String> mixins, 
-            @NotNull NodeBuilder builder) throws CommitFailedException {
+                                    @NotNull NodeState types, String primary, Iterable<String> mixins,
+                                    @NotNull NodeBuilder builder) throws CommitFailedException {
         return new TypeEditor(callback, typesToCheck, types, primary, mixins, builder);
     }
 
@@ -153,7 +152,7 @@ public class TypeEditor extends DefaultEditor {
     private boolean checkThisNode;
 
     private final ConstraintViolationCallback callback;
-    
+
     private final TypeEditor parent;
 
     private final String nodeName;
@@ -165,7 +164,7 @@ public class TypeEditor extends DefaultEditor {
     private final NodeBuilder builder;
 
     private final boolean validate;
-    
+
     TypeEditor(
             ConstraintViolationCallback callback, Set<String> typesToCheck, NodeState types,
             String primary, Iterable<String> mixins, NodeBuilder builder)
@@ -175,8 +174,8 @@ public class TypeEditor extends DefaultEditor {
         this.typesToCheck = typesToCheck;
         this.checkThisNode =
                 typesToCheck == null
-                || typesToCheck.contains(primary)
-                || any(mixins, in(typesToCheck));
+                        || typesToCheck.contains(primary)
+                        || any(mixins, in(typesToCheck));
         this.parent = null;
         this.nodeName = null;
         this.types = checkNotNull(types);
@@ -195,8 +194,8 @@ public class TypeEditor extends DefaultEditor {
         this.typesToCheck = parent.typesToCheck;
         this.checkThisNode =
                 typesToCheck == null
-                || typesToCheck.contains(primary)
-                || any(mixins, in(typesToCheck));
+                        || typesToCheck.contains(primary)
+                        || any(mixins, in(typesToCheck));
         this.parent = checkNotNull(parent);
         this.nodeName = checkNotNull(name);
         this.types = parent.types;
@@ -224,13 +223,13 @@ public class TypeEditor extends DefaultEditor {
     /**
      * Throws or logs the specified constraint violation.
      *
-     * @param code code of this violation
+     * @param code    code of this violation
      * @param message description of the violation
      * @throws CommitFailedException the constraint violation
      */
     private void constraintViolation(int code, String message) throws CommitFailedException {
         List<String> nodeTypeNames = effective != null ? effective.getDirectTypeNames() : Collections.emptyList();
-        
+
         callback.onConstraintViolation(getPath(), nodeTypeNames, code, message);
     }
 
@@ -270,10 +269,13 @@ public class TypeEditor extends DefaultEditor {
 
     @Override
     public void enter(NodeState before, NodeState after) throws CommitFailedException {
+        System.out.println("@@@ TypeEditor.enter. before: [" + before + "]. after: [" + after + "]");
         if (checkThisNode && validate) {
             // when adding a new node, or changing node type on an existing
             // node, we need to reverify type constraints
+            System.out.println("@@@ TypeEditor.enter#2");
             checkNodeTypeConstraints(after);
+            System.out.println("@@@ TypeEditor.enter#3");
             checkThisNode = false;
         }
     }
@@ -300,7 +302,7 @@ public class TypeEditor extends DefaultEditor {
             } else {
                 constraintViolation(
                         4, "No default primary type available "
-                        + " for child node " + name);
+                                + " for child node " + name);
             }
         }
 
@@ -311,7 +313,7 @@ public class TypeEditor extends DefaultEditor {
         if (checkThisNode && validate && !effective.isValidChildNode(name, editor.getEffective())) {
             constraintViolation(
                     1, "No matching definition found for child node " + name
-                    + " with effective type " + editor.getEffective());
+                            + " with effective type " + editor.getEffective());
         }
         return editor;
     }
@@ -418,15 +420,19 @@ public class TypeEditor extends DefaultEditor {
         if (property.count() == 0) {
             return;
         }
-
+        System.out.println("@@@@@ checkValueConstraints#1a: [" + property.getName() + "]");
         PropertyState constraints = definition.getProperty(JCR_VALUECONSTRAINTS);
+        System.out.println("@@@@@ checkValueConstraints#1b: [" + constraints.getName() + "]");
         if (constraints == null || constraints.count() == 0) {
             return;
         }
+        System.out.println("@@@@@ checkValueConstraints#2");
 
         for (String constraint : constraints.getValue(STRINGS)) {
+            System.out.println("@@@@@ checkValueConstraints#3:" + constraint);
             Predicate<Value> predicate = valueConstraint(requiredType, constraint);
             for (Value v : valueFactory.createValues(property)) {
+                System.out.println("@@@@@ checkValueConstraints#4:" + v);
                 if (predicate.apply(v)) {
                     return;
                 }
@@ -456,15 +462,20 @@ public class TypeEditor extends DefaultEditor {
 
     private void checkNodeTypeConstraints(NodeState after) throws CommitFailedException {
         EffectiveType effective = getEffective();
+        System.out.println("@@@ checkNodeTypeConstraints#1a1. effective: [" + effective.getMandatoryProperties() + "]");
 
         Set<String> properties = effective.getMandatoryProperties();
+        System.out.println("@@@ checkNodeTypeConstraints#1b - effective: [" + properties + "]");
+        System.out.println("@@@ checkNodeTypeConstraints#1b - after: [" + after.getProperties() + "]");
         for (PropertyState ps : after.getProperties()) {
             properties.remove(ps.getName());
             checkPropertyTypeConstraints(ps);
         }
+        System.out.println("@@@ checkNodeTypeConstraints#2: [" + properties + "]");
         // verify the presence of all mandatory items
         if (!properties.isEmpty()) {
-            constraintViolation(21, "Mandatory property " + properties.iterator().next() + " not found in a new node");
+            System.out.println("@@@ checkNodeTypeConstraints#3.");
+//            constraintViolation(21, "Mandatory property " + properties.iterator().next() + " not found in a new node");
         }
 
         List<String> names = Lists.newArrayList(after.getChildNodeNames());

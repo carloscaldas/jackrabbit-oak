@@ -244,16 +244,23 @@ class MutableRoot implements Root {
 
     @Override
     public void commit(@NotNull Map<String, Object> info) throws CommitFailedException {
+        System.out.println("@@@@@ commit#1");
         checkLive();
+        System.out.println("@@@@@ commit#2");
         ContentSession session = getContentSession();
+        System.out.println("@@@@@ commit#3");
         CommitInfo commitInfo = new CommitInfo(
                 session.toString(), session.getAuthInfo().getUserID(), newInfoWithCommitContext(info));
+        System.out.println("@@@@@ commit#4");
         store.merge(builder, getCommitHook(), commitInfo);
+        System.out.println("@@@@@ commit#5");
         secureBuilder.baseChanged();
+        System.out.println("@@@@@ commit#6");
         modCount = 0;
         if (permissionProvider.hasValue()) {
             permissionProvider.get().refresh();
         }
+        System.out.println("@@@@@ commit#7");
         moveTracker.clear();
     }
 
@@ -270,29 +277,37 @@ class MutableRoot implements Root {
      *         defined with the security modules and the padded {@code hooks}.
      */
     private CommitHook getCommitHook() {
+        System.out.println("@@@ getCommitHook#1");
         List<CommitHook> hooks = newArrayList();
         hooks.add(ResetCommitAttributeHook.INSTANCE);
         hooks.add(hook);
+        System.out.println("@@@ getCommitHook#2");
 
         List<CommitHook> postValidationHooks = new ArrayList<CommitHook>();
         List<ValidatorProvider> validators = new ArrayList<>();
 
+        System.out.println("@@@ getCommitHook#3");
         for (SecurityConfiguration sc : securityProvider.getConfigurations()) {
             for (CommitHook ch : sc.getCommitHooks(workspaceName)) {
                 if (ch instanceof PostValidationHook) {
+        System.out.println("@@@ getCommitHook#4");
                     postValidationHooks.add(ch);
                 } else if (ch != EmptyHook.INSTANCE) {
+        System.out.println("@@@ getCommitHook#5");
                     hooks.add(ch);
                 }
             }
 
+        System.out.println("@@@ getCommitHook#6");
             validators.addAll(sc.getValidators(workspaceName, subject.getPrincipals(), moveTracker));
         }
 
+        System.out.println("@@@ getCommitHook#7");
         if (!validators.isEmpty()) {
             hooks.add(new EditorHook(CompositeEditorProvider.compose(validators)));
         }
         hooks.addAll(postValidationHooks);
+        System.out.println("@@@ getCommitHook#8");
 
         return CompositeHook.compose(hooks);
     }

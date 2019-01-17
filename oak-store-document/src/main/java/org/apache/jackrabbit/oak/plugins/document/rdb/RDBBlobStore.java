@@ -163,14 +163,19 @@ public class RDBBlobStore extends CachingBlobStore implements Closeable {
     private boolean readOnly;
 
     private void initialize(DataSource ds, DocumentNodeStoreBuilder<?> builder, RDBOptions options) throws Exception {
+        System.out.println("@@@@@@@@@@@ step0");
 
         this.readOnly = builder == null ? false : builder.getReadOnlyMode();
- 
-        this.tnData = RDBJDBCTools.createTableName(options.getTablePrefix(), "DATASTORE_DATA");
-        this.tnMeta = RDBJDBCTools.createTableName(options.getTablePrefix(), "DATASTORE_META");
+        System.out.println("@@@@@@@@@@@ step1");
 
+        this.tnData = RDBJDBCTools.createTableName(options.getTablePrefix(), "DATASTORE_DATA");
+        System.out.println("@@@@@@@@@@@ step2");
+        this.tnMeta = RDBJDBCTools.createTableName(options.getTablePrefix(), "DATASTORE_META");
+        System.out.println("@@@@@@@@@@@ step3");
         this.ch = new RDBConnectionHandler(ds);
+        System.out.println("@@@@@@@@@@@ step4");
         Connection con = this.ch.getRWConnection();
+        System.out.println("@@@@@@@@@@@ step5");
 
         int isolation = con.getTransactionIsolation();
         String isolationDiags = RDBJDBCTools.isolationLevelToString(isolation);

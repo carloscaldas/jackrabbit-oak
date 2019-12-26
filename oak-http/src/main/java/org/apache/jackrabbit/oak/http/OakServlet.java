@@ -51,11 +51,11 @@ public class OakServlet extends HttpServlet {
             MediaType.parse("application/x-jackson-smile");
 
     private static final Representation[] REPRESENTATIONS = {
-        new HtmlRepresentation(),
-        new TextRepresentation(),
-        new JsonRepresentation(JSON, new JsonFactory()),
-        new JsonRepresentation(SMILE, new SmileFactory()),
-        new PostRepresentation() };
+            new HtmlRepresentation(),
+            new TextRepresentation(),
+            new JsonRepresentation(JSON, new JsonFactory()),
+            new JsonRepresentation(SMILE, new SmileFactory()),
+            new PostRepresentation()};
 
     private final ContentRepository repository;
 
@@ -138,23 +138,30 @@ public class OakServlet extends HttpServlet {
             HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         try {
+            System.out.println("@@@ doPost#1");
             Root root = (Root) request.getAttribute("root");
             Tree tree = (Tree) request.getAttribute("tree");
             String path = (String) request.getAttribute("path");
+            System.out.println("@@@ doPost#2");
 
             for (String name : PathUtils.elements(path)) {
                 tree = tree.addChild(name);
             }
+            System.out.println("@@@ doPost#3");
 
             ObjectMapper mapper = new ObjectMapper();
             JsonNode node = mapper.readTree(request.getInputStream());
             if (node.isObject()) {
+                System.out.println("@@@ doPost#4");
                 post(node, tree);
+                System.out.println("@@@ doPost#5");
                 root.commit();
                 request.setAttribute("path", "");
                 request.setAttribute("tree", tree);
+                System.out.println("@@@ doPost#6");
                 doGet(request, response);
             } else {
+                System.out.println("@@@ doPost#7");
                 response.sendError(HttpServletResponse.SC_BAD_REQUEST);
             }
         } catch (CommitFailedException e) {

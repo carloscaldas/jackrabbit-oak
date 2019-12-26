@@ -30,13 +30,15 @@ import org.jetbrains.annotations.NotNull;
 public class CompositeHook implements CommitHook {
 
     public static CommitHook compose(@NotNull Collection<CommitHook> hooks) {
+        System.out.println("@@@ CompositeHook.compose: [" + hooks.size() + "]");
         switch (hooks.size()) {
-        case 0:
-            return EmptyHook.INSTANCE;
-        case 1:
-            return hooks.iterator().next();
-        default:
-            return new CompositeHook(hooks);
+            case 0:
+                return EmptyHook.INSTANCE;
+            case 1:
+                return hooks.iterator().next();
+            default:
+                System.out.println("@@@ CompositeHook.compose#3");
+                return new CompositeHook(hooks);
         }
     }
 
@@ -55,9 +57,13 @@ public class CompositeHook implements CommitHook {
     public NodeState processCommit(
             NodeState before, NodeState after, CommitInfo info)
             throws CommitFailedException {
+        System.out.println("@@@ CompositeHook.processCommit#1");
         NodeState newState = after;
+        System.out.println("@@@ CompositeHook.processCommit#2");
         for (CommitHook hook : hooks) {
+            System.out.println("@@@ CompositeHook.processCommit#3");
             newState = hook.processCommit(before, newState, info);
+            System.out.println("@@@ CompositeHook.processCommit#4");
         }
         return newState;
     }

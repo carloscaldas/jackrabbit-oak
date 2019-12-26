@@ -19,3 +19,8 @@ oak:
   mongo:
     db: oak
     uri: mongodb://localhost:27017
+#  Oak-RDB:
+#    rdbjdbcuri: "jdbc:sqlserver://localhost:1401;databasename=newdb;user=sa;password=Root123@"
+#    rdbjdbcuser: "sa"
+#    rdbjdbcpasswd: "Root123@"
+#    db: "newdb"

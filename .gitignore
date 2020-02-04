@@ -14,3 +14,4 @@ derby.log
 segmentstore/
 *.tar
 **/oak/repository/blobids/**
+.DS_Store
